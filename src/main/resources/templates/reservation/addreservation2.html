@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)http://getbootstrap.com/docs/4.0/examples/dashboard/ -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Add Reservation</title>
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+
+</head>
+
+<body>
+<div th:insert="~{base::topbar}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!--				传参数list 用于高亮-->
+        <div th:insert="~{base::sidebar(active='list')}"></div>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+            <form th:action="@{/reservation/added}" method="post">
+                <div class="form-group">
+                    <label>开始日期</label>
+
+                    <input type="date" name="startDate" class="form-control" placeholder="yyyy-mm-dd" readonly="readonly"
+                           th:value="${#dates.format(startDate,'yyyy-MM-dd')}">
+                </div>
+                <div class="form-group">
+                    <label>结束日期</label>
+                    <input type="date" name="endDate" class="form-control" placeholder="yyyy-mm-dd" readonly="readonly"
+                           th:value="${#dates.format(endDate,'yyyy-MM-dd')}">
+                </div>
+                <div class="form-group">
+                    <label>预定房间数量:</label>
+                    <input readonly="readonly" type="text" name="roomNum" class="form-control" placeholder="您要几间房？"
+                    th:value="${roomNum}">
+                </div>
+                <div class="form-group">
+                    <label>预定的顾客:</label>
+                    <select class="form-control" name="mycustomer">
+                        <option th:each="c:${customers}" th:value="${c.getCid()}">
+                            姓名:[[${c.getCname()}]],手机号:[[${c.getPhoneNum()}]]
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>空余房间</label>
+                    <span th:each="i:${#numbers.sequence(1,roomNum)}">
+                        <select class="form-control" name="selectedroom">
+
+                            <option th:each="room:${availableRooms}" th:value="${room.getRid()}"
+                                    th:if="${room.getRid() ne null}">
+                                房间号:[[${room.getRoomNumber()}]], 房间类型:[[${room.getRtype()}]]
+                            </option>
+                            <option th:each="room:${availableRooms}" th:value="${room.getRid()}"
+                                    th:if="${room.getRid() eq ''}">
+                                抱歉！当前日期已经没有空房了
+                            </option>
+                        </select>
+                    </span>
+                    <span style="color: red">[[${error}]]</span>
+                </div>
+
+
+
+                <button type="submit" class="btn btn-default" >提交</button>
+            </form>
+        </main>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+
+<!-- Placed at the end of the document so the pages load faster -->
+<script type="text/javascript" th:src="@{/js/jquery-3.2.1.slim.min.js}" ></script>
+<script type="text/javascript" th:src="@{/js/popper.min.js}" ></script>
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}" ></script>
+
+<!-- Icons -->
+<script type="text/javascript" th:src="@{/js/feather.min.js}" ></script>
+<script>
+    feather.replace()
+</script>
+
+
+
+</body>
+
+</html>

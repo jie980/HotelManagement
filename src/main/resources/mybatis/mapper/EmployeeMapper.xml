@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--匹配mapperinterface-->
+<mapper namespace="com.jie.springboot_mybatis2.Mapper.EmployeeMapper">
+    <select id="getAll" resultType="Employee">
+        SELECT * FROM Employee ORDER BY eid
+    </select>
+<!--    同是获取employee和department信息连表查询-->
+
+    <select id="getAllIncludeDepartment" resultMap="empDptMap">
+        SELECT e.*,d.dname FROM Employee as e,Department as d WHERE e.did=d.did
+    </select>
+    <!--    <resultMap id="给ID名" type="实体类" >-->
+    <!--        <result column="数据库字段名" property="实体类属性" jdbcType="数据库字段类型" />-->
+    <!--    </resultMap-->
+    <resultMap id="empDptMap" type="Employee">
+        <id column="eid" property="eid" jdbcType="INTEGER"></id>
+        <result column="email" property="email" jdbcType="VARCHAR"></result>
+        <result column="ename" property="ename" jdbcType="VARCHAR"></result>
+        <result column="gender" property="gender" jdbcType="INTEGER"></result>
+        <result column="did" property="did" jdbcType="INTEGER"></result>
+        <association property="adepartment">
+            <id column="did" property="did"></id>
+            <result column="dname" property="dname"></result>
+        </association>
+    </resultMap>
+<!--   id 就是方法名，resultType就是returntype, #{eid}为方法参数 -->
+    <select id="
+
+    loyee" parameterType="int" resultType="com.jie.springboot_mybatis2.Bean.Employee">
+        SELECT * FROM Employee WHERE eid=#{eid}
+    </select>
+    <insert id="insertEmployee">
+        INSERT INTO Employee(email,ename,gender,did) VALUES(#{email},#{ename},#{gender},#{did})
+    </insert>
+    <select id="getEmployeeBydepartment" resultType="employee">
+        SELECT * FROM Employee WHERE did=#{did}
+    </select>
+    <select id="getEmployee" resultType="employee">
+        SELECT * FROM Employee WHERE eid=#{eid}
+    </select>
+
+    <update id="updateEmployee">
+        UPDATE Employee SET email=#{email}, ename=#{ename}, gender=#{gender}, did=#{did} WHERE eid=#{eid}
+    </update>
+    <delete id="deleteEmployee">
+        DELETE FROM Employee WHERE eid=#{eid}
+    </delete>
+
+    <!--    根据条件查询-->
+    <select id="getEmpByCondition" parameterType="employee" resultType="employee">
+        SELECT * FROM Employee
+        <where>
+            <if test="ename != null">    --test=""里为数据库的列名
+                and ename like #{ename}  --模糊查询
+            </if>
+            <if test="gender != null">
+                and gender = #{gender}
+            </if>
+        </where>
+    </select>
+
+<!--    根据queryvo的idlist查询多条数据 SELECT * FROM Employee WHERE eid IN (idlist)-->
+    <select id="findEmpInIdlist" resultType="employee" parameterType="queryvo">
+        SELECT * FROM Employee
+        <where>
+            <foreach collection="idlist" open="and eid IN (" close=")" item="eid" separator=",">
+                #{eid}
+            </foreach>
+        </where>
+    </select>
+
+
+
+
+</mapper>

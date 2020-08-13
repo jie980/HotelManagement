@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--匹配mapperinterface-->
+<mapper namespace="com.jie.springboot_mybatis2.Mapper.RoomRemarkMapper">
+    <select id="getAll" resultType="roomremark">
+        SELECT * FROM roomremark
+    </select>
+    <select id="getByRrid" resultType="roomremark" parameterType="java.lang.Integer">
+        SELECT * FROM roomremark WHERE rrid=#{rrid}
+    </select>
+
+    <select id="getByRid" resultType="roomremark" parameterType="java.lang.Integer">
+        SELECT * FROM roomremark WHERE rid=#{rid}
+    </select>
+    <insert id="insertRemark" parameterType="com.jie.springboot_mybatis2.Bean.RoomRemark">
+        INSERT INTO roomremark(topic,contentDetail,rid,createDate) VALUES (#{topic},#{contentDetail},#{rid},#{createDate})
+    </insert>
+
+    <update id="updateRemark" parameterType="roomremark">
+        UPDATE roomremark SET topic=#{topic}, contentDetail=#{contentDetail}
+    </update>
+    <delete id="deleteRemark" parameterType="java.lang.Integer">
+        DELETE FROM roomremark WHERE rrid=#{rrid}
+    </delete>
+</mapper>

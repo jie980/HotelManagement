@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--匹配mapperinterface-->
+<mapper namespace="com.jie.springboot_mybatis2.Mapper.RoomMapper">
+    <select id="getAll" resultType="Room">
+        SELECT * FROM Room ORDER BY roomNumber
+    </select>
+
+
+    <select id="getAllIncludeReservation" resultMap="RoomReservation">
+        SELECT X.*,re.startdate,re.enddate,re.reservationstatus FROM
+        (SELECT ro.*,rr.reid FROM Room AS ro LEFT OUTER JOIN RoomReservation AS rr ON ro.rid=rr.rid) AS X
+        JOIN Reservation AS re ON X.reid=re.reid
+    </select>
+    <select id="getRoomIncludeReservation" resultMap="RoomReservation">
+		SELECT * FROM
+        (SELECT X.*,re.startdate,re.enddate,re.reservationstatus FROM
+        (SELECT ro.*,rr.reid FROM Room AS ro LEFT OUTER JOIN RoomReservation AS rr ON ro.rid=rr.rid)
+		AS X LEFT OUTER JOIN Reservation AS re ON X.reid=re.reid)
+		AS Y WHERE Y.rid=#{rid}
+        ORDER BY Y.startdate
+    </select>
+    <resultMap id="RoomReservation" type="room">
+        <id property="rid" column="rid"></id>
+        <result property="roomNumber" column="roomNumber"></result>
+        <result property="rtype" column="rtype"></result>
+        <result property="roomStatus" column="roomstatus"></result>
+        <collection property="reservations" ofType="com.jie.springboot_mybatis2.Bean.Reservation">
+            <id column="reid" property="reid"></id>
+            <result column="startdate" property="startDate" jdbcType="DATE"></result>
+            <result column="enddate" property="endDate" jdbcType="DATE"></result>
+            <result column="reservationStatus" property="reservationStatus"></result>
+        </collection>
+    </resultMap>
+<!--    用于查房间类型和剩余房间数-->
+    <select id="countAvailableRoom" resultMap="byType">
+        SELECT rtype, COUNT(*) AS numsofroom FROM Room WHERE roomStatus='V' GROUP BY rtype
+    </select>
+<!--    <resultMap id="给ID名" type="实体类" >-->
+<!--        <result column="数据库字段名" property="实体类属性" jdbcType="数据库字段类型" />-->
+<!--    </resultMap-->
+    <resultMap id="byType" type="java.util.Map">
+        <result column="RTYPE" property="rtype" jdbcType="VARCHAR"></result>
+        <result column="numsofroom" property="nums"  jdbcType="INTEGER"></result>
+    </resultMap>
+
+    <select id="getVroombyType" resultMap="RoomRemark">
+        SELECT * FROM Room AS ro LEFT OUTER JOIN Roomremark AS rr ON
+        ro.rid=rr.rid WHERE rtype=#{rtype} ORDER BY roomStatus
+    </select>
+
+    <select id="getRoomIncludeRemark" resultMap="RoomRemark" >
+        SELECT * FROM Room AS ro LEFT OUTER JOIN RoomRemark AS rr ON ro.rid=rr.rid WHERE ro.rid=#{rid}
+    </select>
+    <select id="getAllIncludeRemark" resultMap="RoomRemark">
+        SELECT * FROM Room AS ro LEFT OUTER JOIN Roomremark AS rr ON
+        ro.rid=rr.rid ORDER BY ro.roomNumber
+    </select>
+
+    <resultMap id="RoomRemark" type="room">
+        <id property="rid" column="rid"></id>
+        <result property="roomNumber" column="roomNumber"></result>
+        <result property="rtype" column="rtype"></result>
+        <result property="roomStatus" column="roomstatus"></result>
+        <collection property="roomRemarks" ofType="com.jie.springboot_mybatis2.Bean.RoomRemark">
+            <id property="rrid" column="rrid"></id>
+            <result property="topic" column="topic"></result>
+            <result property="contentDetail" column="contentDetail"></result>
+            <result property="createDate" column="createDate"></result>
+
+        </collection>
+    </resultMap>
+
+</mapper>

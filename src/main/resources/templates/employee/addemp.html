@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)http://getbootstrap.com/docs/4.0/examples/dashboard/ -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Add Emp</title>
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+    <style type="text/css">
+        /* Chart.js */
+
+        @-webkit-keyframes chartjs-render-animation {
+            from {
+                opacity: 0.99
+            }
+            to {
+                opacity: 1
+            }
+        }
+
+        @keyframes chartjs-render-animation {
+            from {
+                opacity: 0.99
+            }
+            to {
+                opacity: 1
+            }
+        }
+
+        .chartjs-render-monitor {
+            -webkit-animation: chartjs-render-animation 0.001s;
+            animation: chartjs-render-animation 0.001s;
+        }
+    </style>
+</head>
+
+<body>
+<div th:insert="~{base::topbar}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!--				传参数list 用于高亮-->
+        <div th:insert="~{base::sidebar(active='list')}"></div>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+            <form th:action="@{/emp/added}" method="post">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="ename" class="form-control" placeholder="Name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <label>Gender</label><br>
+                    <input class="form-check-input" type="radio" name="gender" value="1" checked>
+                    <label>Male</label><br>
+                    <input class="form-check-input" type="radio" name="gender" value="0">
+                    <label>Female</label><br>
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <select class="form-control" name="did">
+                        <option th:each="dept:${departments}" th:text="${dept.getDname()}" th:value="${dept.getDid()}"></option>
+                    </select>
+
+
+                </div>
+
+
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+        </main>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+
+<!-- Placed at the end of the document so the pages load faster -->
+<script type="text/javascript" th:src="@{/js/jquery-3.2.1.slim.min.js}" ></script>
+<script type="text/javascript" th:src="@{/js/popper.min.js}" ></script>
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}" ></script>
+
+<!-- Icons -->
+<script type="text/javascript" th:src="@{/js/feather.min.js}" ></script>
+<script>
+    feather.replace()
+</script>
+
+
+
+</body>
+
+</html>
