@@ -7,6 +7,8 @@ import com.jie.springboot_mybatis2.Bean.RoomReservation;
 import com.jie.springboot_mybatis2.Mapper.RoomMapper;
 import com.jie.springboot_mybatis2.Mapper.RoomRemarkMapper;
 import com.jie.springboot_mybatis2.Mapper.RoomReservationMapper;
+import com.jie.springboot_mybatis2.Service.RoomRemarkService;
+import com.jie.springboot_mybatis2.Service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,17 +23,17 @@ import java.util.Set;
 @Controller
 public class RoomController {
     @Autowired
-    RoomMapper roomMapper;
+    RoomService roomService;
     @Autowired
     RoomReservationMapper roomReservationMapper;
     @Autowired
-    RoomRemarkMapper roomRemarkMapper;
+    RoomRemarkService roomRemarkService;
 
 
     @GetMapping({"room","room/show"})
     public String showAll(Model model, @RequestParam(required = false,value = "error") String error){
-        List<Room> rlist = roomMapper.getAllIncludeRemark();
-        List<Map> roomStat = roomMapper.countAvailableRoom();
+        List<Room> rlist = roomService.getAll(1);
+        List<Map> roomStat = roomService.countAvailableRoom();
 //        for(Map r:remainroom){
 //            System.out.println(r.get("rtype"));
 //            System.out.println(r.get("count"));
@@ -45,7 +47,7 @@ public class RoomController {
     }
     @GetMapping("room/edited/{rid}")
     public String editedroom(Model model, @PathVariable Integer rid){
-        Room room = roomMapper.getroom(rid);
+        Room room = roomService.getroom(rid,3);
         String rstatus = room.getRoomStatus();
         System.out.println(rstatus);
         if( rstatus.equals("V")){
@@ -54,7 +56,7 @@ public class RoomController {
         else{
             room.setRoomStatus("V");
         }
-        roomMapper.editroom(room);
+        roomService.editroom(room);
         return "redirect:/room/show";
     }
     @GetMapping("room/addform")
@@ -63,20 +65,20 @@ public class RoomController {
     }
     @PostMapping("room/added")
     public String addedroom(Model model, Room room){
-        List<Room> rooms= roomMapper.getAll();
+        List<Room> rooms= roomService.getAll(2);
         for(Room r:rooms){
             if(r.getRoomNumber().equals(room.getRoomNumber())){
                 model.addAttribute("error","房间号已存在!");
                 return "room/addroom";
             }
         }
-        roomMapper.addroom(room);
+        roomService.addroom(room);
         return "redirect:/room/show";
     }
     @GetMapping("room/deleted/{rid}")
     public String deletedroom(@PathVariable Integer rid, Model model, RedirectAttributes redirectAttributes){
         List<RoomReservation> roomReservations= roomReservationMapper.getRRbyRid(rid);
-        List<RoomRemark> roomRemarks = roomRemarkMapper.getByRid(rid);
+        List<RoomRemark> roomRemarks = roomRemarkService.getByRid(rid);
         if(!roomReservations.isEmpty()){
             redirectAttributes.addAttribute("error","该房间还存在预定无法删除");
 
@@ -85,19 +87,20 @@ public class RoomController {
         else{
             //先删除所有房间备注
             for(RoomRemark roomRemark:roomRemarks){
-                roomRemarkMapper.deleteRemark(roomRemark.getRrid());
+                roomRemarkService.delete(roomRemark.getRrid());
             }
-            roomMapper.deleteroom(rid);}
+            roomService.deleteroom(rid);
+        }
 
         return "redirect:/room/show";
     }
 
     @GetMapping("room/{rtype}")
     public String showVacantRoomByType(@PathVariable String rtype, Model model){
-        List<Room>  rooms = roomMapper.getVroombyType(rtype);
+        List<Room>  rooms = roomService.getVroombyType(rtype);
         model.addAttribute("rooms",rooms);
         //Map<房间类型，剩余数量>
-        List<Map> roomStat = roomMapper.countAvailableRoom();
+        List<Map> roomStat = roomService.countAvailableRoom();
         model.addAttribute("roomStat",roomStat);
         return "room/rooms";
 
@@ -107,7 +110,8 @@ public class RoomController {
                              @RequestParam(required = false) Integer rid,
                              Model model){
         if(roomNumber!=null){
-            Room room = roomMapper.getroomByroomNumber(roomNumber);
+            Room room = roomService.getroomByroomNumber(roomNumber);
+            System.out.println(room);
             if(room==null){
                 model.addAttribute("error","该Room Number 不存在！");
                 return "room/notExist";
@@ -115,8 +119,8 @@ public class RoomController {
             rid = room.getRid();
 
         }
-        Room room = roomMapper.getRoomIncludeReservation(rid);
-        Room moreinfo = roomMapper.getRoomIncludeRemark(rid);
+        Room room = roomService.getroom(rid,0);
+        Room moreinfo = roomService.getroom(rid,1);
         if(room==null){
             model.addAttribute("error","该Room Number 不存在！");
             return "room/notExist";
@@ -125,7 +129,7 @@ public class RoomController {
 
         model.addAttribute("room",room);
         model.addAttribute("moreinfo",moreinfo);
-        List<Map> roomStat = roomMapper.countAvailableRoom();
+        List<Map> roomStat = roomService.countAvailableRoom();
         model.addAttribute("roomStat",roomStat);
         return "room/detail";
     }
