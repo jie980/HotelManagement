@@ -79,7 +79,7 @@ public class AdminController {
         return "signup";
     }
 
-    @PostMapping("/signedup")
+    @RequestMapping("/signedup")
     public String signedup(Administrator administrator,Model model) throws NoSuchAlgorithmException {
         String name = administrator.getUsername();
         String email = administrator.getEmail();

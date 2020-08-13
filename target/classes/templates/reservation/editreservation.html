@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>edit reservation</title>
+</head>
+<body>
+    <form method="POST" th:action="@{/reservation/edited}">
+    <div class="form-group">
+        <input type="hidden" name="reid" th:value="${reid}" >
+        <input type="hidden" name="startDate" th:value="${startDate}" >
+        <input type="hidden" name="endDate" th:value="${endDate}">
+        <input type="hidden" name="cid" th:value="${cid}">
+        <label>订单状态</label><br>
+        <input class="form-check-input" type="radio" name="reservationStatus" value="未入住"
+               th:checked="${reservationStatus eq '未入住'}">
+        <label>未入住</label><br>
+        <input class="form-check-input" type="radio" name="reservationStatus" value="已入住"
+               th:checked="${reservationStatus eq '已入住'}">
+        <label>已入住</label><br>
+        <input class="form-check-input" type="radio" name="reservationStatus" value="已退房"
+               th:checked="${reservationStatus eq '已退房'}">
+        <label>已退房</label><br>
+        <button type="submit">提交</button>
+
+    </div>
+    </form>
+</body>
+</html>

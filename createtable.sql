@@ -2,7 +2,7 @@
 CREATE TABLE Department(
 	did SERIAL PRIMARY KEY,
 	dname VARCHAR(30) NOT NULL);
-	
+
 CREATE TABLE Employee(
 	eid SERIAL PRIMARY KEY,
 	email VARCHAR(30),
@@ -10,7 +10,7 @@ CREATE TABLE Employee(
 	gender INT,
 	did INT,
 	FOREIGN KEY (did) REFERENCES Department);
-	
+
 CREATE TABLE Room(
 rid SERIAL PRIMARY KEY,
 rtype VARCHAR(20) NOT NULL,
@@ -48,18 +48,17 @@ CREATE TABLE RoomReservation(
 rid INTEGER NOT NULL,
 reid INTEGER NOT NULL,
 PRIMARY KEY(rid, reid),
-FOREIGN KEY(rid) 
+FOREIGN KEY(rid)
     REFERENCES Room,
-FOREIGN KEY(reid) 
+FOREIGN KEY(reid)
     REFERENCES Reservation
 );
-
 
 CREATE TABLE Administrator(
 aid SERIAL PRIMARY KEY,
 username VARCHAR(30) NOT NULL,
 email VARCHAR(30) NOT NULL,
-pwd VARCHAR(100) NOT NULL);
-
+pwd VARCHAR(100) NOT NULL,
+profilepic VARCHAR(100));
 
 

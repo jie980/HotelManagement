@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--匹配mapperinterface-->
+<mapper namespace="com.jie.springboot_mybatis2.Mapper.DepartmentMapper">
+    <select id="getAllIncludeEmps" resultMap="dptEmpMap">
+        SELECT d.*, e.eid, e.email, e.ename, e.gender, e.did
+        FROM Department as d LEFT OUTER JOIN Employee as e ON d.did=e.did ORDER BY d.did
+    </select>
+    <resultMap id="dptEmpMap" type="department">
+        <id property="did" column="did"></id>
+        <result property="dname" column="dname"></result>
+<!--        配置dpt里的emps集合-->
+        <collection property="emps" ofType="com.jie.springboot_mybatis2.Bean.Employee">
+            <id column="eid" property="eid" jdbcType="INTEGER"></id>
+            <result column="email" property="email" jdbcType="VARCHAR"></result>
+            <result column="ename" property="ename" jdbcType="VARCHAR"></result>
+            <result column="gender" property="gender" jdbcType="INTEGER"></result>
+            <result column="did" property="did" jdbcType="INTEGER"></result>
+        </collection>
+    </resultMap>
+
+    <select id="getDepartmentIncludeEmps" resultMap="dptEmpMap">
+        SELECT d.*, e.eid, e.email, e.ename, e.gender, e.did
+        FROM Department as d LEFT OUTER JOIN Employee as e ON d.did=e.did
+        WHERE d.did=#{did} ORDER BY e.eid
+    </select>
+
+</mapper>

@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    username: postgres
+    password: 616198
+    url: jdbc:postgresql://localhost:5433/mybatis
+    driver-class-name: org.postgresql.Driver
+  thymeleaf:
+    cache: false
+  servlet:
+    multipart:
+      max-file-size: 20MB #设置上传单个文件大小
+      max-request-size: 100MB #一个request所包含文件大小
+
+
+mybatis:
+  config-location: classpath:mybatis/Config.xml
+  #将mybatis映射文件配置到项目中,配置xml用的
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  type-aliases-package: com.jie.springboot_mybatis2.Bean #配置了就不用resultType写全类名
+logging:
+  level:
+    com:
+      jie:
+        springboot_mybatis2:
+          Mapper: debug

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--匹配mapperinterface-->
+<mapper namespace="com.jie.springboot_mybatis2.Mapper.CustomerMapper">
+    <select id="getAllIncludeReservation" resultMap="CustomerReservation">
+        SELECT * FROM Customer AS cu LEFT OUTER JOIN Reservation AS re ON cu.cid=re.cid
+    </select>
+    <select id="getCustomerIncludeReservation" resultMap="CustomerReservation">
+        SELECT * FROM Customer AS cu LEFT OUTER JOIN Reservation AS re ON cu.cid=re.cid
+        WHERE cu.cid=#{cid} ORDER BY re.startDate
+    </select>
+    <resultMap id="CustomerReservation" type="customer">
+        <id column="cid" property="cid"></id>
+        <result column="phonenum" property="phoneNum"></result>
+        <result column="cname" property="cname"></result>
+        <result column="email" property="email"></result>
+        <collection property="reservations" ofType="reservation">
+            <id column="reid" property="reid"></id>
+            <result column="startdate" property="startDate" jdbcType="DATE"></result>
+            <result column="enddate" property="endDate" jdbcType="DATE"></result>
+            <result column="reservationStatus" property="reservationStatus"></result>
+            <result column="cid" property="cid"></result>
+        </collection>
+    </resultMap>
+
+    <insert id="addCustomer" parameterType="customer">
+        INSERT INTO Customer(phoneNum,cname,email) VALUES(#{phoneNum},#{cname},#{email})
+    </insert>
+    <delete id="deleteCustomer" parameterType="java.lang.Long">
+        DELETE FROM Customer WHERE cid=#{cid}
+    </delete>
+    <update id="editCustomer" parameterType="customer">
+        UPDATE CUSTOMER SET cname=#{cname}, email=#{email}, phoneNum=#{phoneNum} WHERE cid=#{cid}
+    </update>
+
+</mapper>

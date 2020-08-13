@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)http://getbootstrap.com/docs/4.0/examples/dashboard/ -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Dashboard Template for Bootstrap</title>
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+
+</head>
+
+<body>
+<div th:insert="~{base::topbar}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!--				传参数list 用于高亮-->
+        <div th:insert="~{base::sidebar(active='roomlist')}"></div>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+            <h2><a class=btn btn-sm btn-success th:href="@{/room/addform}">Add Room</a></h2>
+            <h2>房间详细信息</h2>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th>房间号</th>
+                        <th>房间类型</th>
+                        <th>房间状态</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td th:text="${room.getRoomNumber()}"></td>
+                        <td th:text="${room.getRtype()}"></td>
+                        <td th:text="${room.getRoomStatus()}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <table class="table table-striped">
+                    <thead>
+                    <h3>房间下的预定</h3>
+                    <tr>
+                        <th>预定ID</th>
+                        <th>开始日期</th>
+                        <th>结束日期</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${room.getReservations().isEmpty()}">
+                        <td>该房间暂无预订</td>
+                    </tr>
+                    <tr th:if="${!room.getReservations().isEmpty()}" th:each="r:${room.getReservations()}">
+                        <td th:text="${r.getReid()}"></td>
+                        <td th:text="${#dates.format(r.getStartDate(),'yyyy-MM-dd')}"></td>
+                        <td th:text="${#dates.format(r.getEndDate(),'yyyy-MM-dd')}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <table class="table table-striped">
+                    <thead>
+                    <h3>房间备注</h3>
+                    <tr>
+                        <th>题目</th>
+                        <th>内容</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${moreinfo.getRoomRemarks().isEmpty()}">
+                        <td>该房间暂无备注信息</td>
+                    </tr>
+                    <tr th:each="rr:${moreinfo.getRoomRemarks()}" >
+                        <td th:text="${rr.getTopic()}"></td>
+                        <td th:text="${rr.getContentDetail()}"></td>
+                        <td th:text="${#dates.format(rr.getCreateDate(),'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td> <a class="btn btn-sm btn-danger" th:href="@{/remark/deleted/}+${rr.getRrid()}">删除</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <a class="btn btn-sm btn-primary leftBottom" th:href="@{/room}">返回</a>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+
+<!-- Placed at the end of the document so the pages load faster -->
+<script type="text/javascript" th:src="@{/js/jquery-3.2.1.slim.min.js}" ></script>
+<script type="text/javascript" th:src="@{/js/popper.min.js}" ></script>
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}" ></script>
+
+<!-- Icons -->
+<script type="text/javascript" th:src="@{/js/feather.min.js}" ></script>
+<script>
+    feather.replace()
+</script>
+
+</body>
+
+</html>

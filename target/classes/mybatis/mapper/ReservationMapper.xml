@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--匹配mapperinterface-->
+<mapper namespace="com.jie.springboot_mybatis2.Mapper.ReservationMapper">
+<!--    <select id="getAll" resultType="com.jie.springboot_mybatis2.Bean.Reservation">-->
+<!--        SELECT * FROM Empl ORDER BY startDate-->
+<!--    </select>-->
+
+    <!--  查找预定信息及关联房间信息更方便的写法  -->
+    <select id="getAllIncludeRoom" resultMap="reservationRoom">
+        SELECT X.*,ro.rtype,ro.roomstatus FROM
+        (SELECT re.*,rr.rid FROM Reservation as re LEFT OUTER JOIN Roomreservation as rr ON re.reid=rr.reid)
+        AS X JOIN Room as ro ON X.rid=ro.rid ORDER BY X.reid
+    </select>
+    <!--  查找一个预定信息及关联房间信息  -->
+    <select id="getReservationIncludeRoom" resultMap="reservationRoom">
+        SELECT X.*,ro.rtype,ro.roomstatus FROM
+        (SELECT re.*,rr.rid FROM Reservation as re LEFT OUTER JOIN Roomreservation as rr ON re.reid=rr.reid)
+        AS X JOIN Room as ro ON X.rid=ro.rid WHERE X.reid=#{reid} ORDER BY X.reid
+    </select>
+    <!--    <resultMap id="给ID名" type="实体类" >-->
+    <!--        <result column="数据库字段名" property="实体类属性" jdbcType="数据库字段类型" />-->
+    <!--    </resultMap-->
+    <resultMap id="reservationRoom" type="reservation">
+        <id column="reid" property="reid"></id>
+        <result column="startdate" property="startDate" jdbcType="DATE"></result>
+        <result column="enddate" property="endDate" jdbcType="DATE"></result>
+        <result column="reservationStatus" property="reservationStatus"></result>
+        <result column="cid" property="cid"></result>
+        <collection property="rooms" ofType="room">
+            <id column="rid" property="rid"></id>
+            <result column="rtype" property="rtype"></result>
+            <result column="roomstatus" property="roomStatus"></result>
+        </collection>
+    </resultMap>
+<!--    查找所有预定信息-->
+    <select id="getAllIncludeRoomCustomer" resultMap="reservationRoomCustomer">
+        SELECT Y.*, cu.cname, cu.email,cu.phoneNum FROM
+        (SELECT X.*,ro.rtype,ro.roomstatus FROM
+        (SELECT re.*,rr.rid FROM Reservation as re LEFT OUTER JOIN Roomreservation as rr ON re.reid=rr.reid)
+        AS X JOIN Room as ro ON X.rid=ro.rid)
+        AS Y JOIN Customer AS cu ON Y.cid=cu.cid
+        ORDER BY Y.startDate
+    </select>
+    <!--  查找一个预定信息和对应房间和顾客信息  -->
+    <select id="getReservationIncludeRoomCustomer" resultMap="reservationRoomCustomer">
+        SELECT Y.*, cu.cname, cu.email,cu.phoneNum FROM
+        (SELECT X.*,ro.rtype,ro.roomstatus,ro.roomnumber FROM
+        (SELECT re.*,rr.rid FROM Reservation as re LEFT OUTER JOIN Roomreservation as rr ON re.reid=rr.reid)
+        AS X JOIN Room as ro ON X.rid=ro.rid WHERE X.reid=#{reid})
+        AS Y JOIN Customer AS cu ON Y.cid=cu.cid
+        ORDER BY Y.reid
+    </select>
+
+    <resultMap id="reservationRoomCustomer" type="reservation">
+        <id column="reid" property="reid"></id>
+        <result column="startdate" property="startDate" jdbcType="DATE"></result>
+        <result column="enddate" property="endDate" jdbcType="DATE"></result>
+        <result column="reservationStatus" property="reservationStatus"></result>
+        <result column="cid" property="cid"></result>
+        <association property="customer">
+            <id column="cid" property="cid"></id>
+            <result column="phoneNum" property="phoneNum"></result>
+            <result column="cname" property="cname"></result>
+            <result column="email" property="email"></result>
+        </association>
+        <collection property="rooms" ofType="room">
+            <id column="rid" property="rid"></id>
+            <result column="rtype" property="rtype"></result>
+            <result column="roomstatus" property="roomStatus"></result>
+            <result column="roomnumber" property="roomNumber"></result>
+        </collection>
+    </resultMap>
+
+
+    <select id="countRoomUnderReservations" resultMap="countrooms">
+        SELECT re.reid, COUNT(*) FROM Reservation AS re JOIN RoomReservation AS rr
+        ON re.reid=rr.reid GROUP BY re.reid ORDER BY re.startDate,re.reid
+    </select>
+    <resultMap id="countrooms" type="java.util.Map">
+        <result column="REID" property="reid" jdbcType="INTEGER"></result>
+        <result column="COUNT" property="count" jdbcType="INTEGER"></result>
+    </resultMap>
+<!--    keyproperty对应实体类，keycolumn对应数据库-->
+    <insert id="addReservation" parameterType="com.jie.springboot_mybatis2.Bean.Reservation" keyProperty="reid" useGeneratedKeys="true">
+
+        INSERT INTO Reservation(startDate,endDate,reservationStatus,cid)
+         VALUES (#{startDate},#{endDate},#{reservationStatus},#{cid});
+    </insert>
+<!--    连接表获取到所有的预定和关联的房间号，再通过日期筛选获取当前日期有预定的房间号，再except-->
+    <select id="searchAvailableRoom" resultType="room">
+        SELECT * FROM Room WHERE rid IN
+        ((SELECT rid FROM Room)
+        EXCEPT
+        (SELECT rr.rid FROM --11-14到11-18有预定的房间
+        Reservation AS re JOIN RoomReservation AS rr ON re.reid=rr.reid
+        AND startDate &lt; #{endDate} AND endDate > #{startDate})
+        ) ORDER BY roomNumber
+    </select>
+    <delete id="deleteReservation">
+        DELETE FROM Reservation WHERE reid=#{reid}
+    </delete>
+    <update id="editReservation">
+        UPDATE Reservation SET startDate=#{startDate}, endDate=#{endDate}, reservationStatus=#{reservationStatus},
+        cid=#{cid} WHERE reid=#{reid}
+    </update>
+</mapper>
