@@ -60,7 +60,8 @@ public class AdminController {
                 if(encodepwd.equals(u.getPwd())){
                     session.setAttribute("user",u);
                     String pic = u.getProfilepic();
-                    return "redirect:/dpt";
+                    return "redirect:/userinfo";
+                    //return "admin/info";
                 }
                 else{
                     model.addAttribute("error","Password is not correct");

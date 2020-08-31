@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 @Mapper
-public interface AdminMappper {
+public interface  AdminMappper {
     @Select("SELECT * FROM Administrator WHERE aid=#{aid}")
     public Administrator getAdmin(Integer aid);
     @Select("SELECT * FROM Administrator")
