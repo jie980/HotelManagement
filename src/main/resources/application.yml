@@ -2,8 +2,8 @@ spring:
   profiles:
     active: dev
   mail:
-    username: 1343688691@qq.com
-    password: czsljeqffdjxfhih
+    username: 
+    password: 
     host: smtp.qq.com
     properties.mail.smtp.starttls.enable: true
 server:
